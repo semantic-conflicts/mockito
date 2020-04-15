@@ -1,29 +1,26 @@
-# When modifying you validate the structure of this file offline with travis-lint
-# gem install travis-lint
-# travis-lint .travis.yml	
 
-
+sudo: required
 language: java
 
 jdk:
-    - oraclejdk7
+  - openjdk8
 
-env:
-    - TERM=dumb
+script:
+  - ./gradlew fatJar
 
-before_install:
-# use Gradle 1.8 
-    - wget http://services.gradle.org/distributions/gradle-1.9-bin.zip
-    - unzip gradle-1.9-bin.zip
-    - export GRADLE_HOME=$PWD/gradle-1.9
-    - export PATH=$GRADLE_HOME/bin:$PATH
-
-install:
-    - true
-
-script: 
-    - gradle build
-
-after_success:
-    - gradle cobertura
-    - gradle coveralls
+before_deploy:
+    - mkdir MiningBuild
+    - find . -name '*.jar' -exec cp {} ./MiningBuild \;
+    - cd /home/travis/build/semantic-conflicts/mockito/MiningBuild
+    - tar -zcvf result.tar.gz *
+deploy:
+  provider: releases
+  api_key: $GITHUB_TOKEN
+  file: result.tar.gz
+  name: fetchjar-5cac0e2b6
+  file_glob: true
+  overwrite: true
+  skip_cleanup: true
+  on:
+    all_branches: true 
+            
