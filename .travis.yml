@@ -1,0 +1,26 @@
+
+sudo: required
+language: java
+
+jdk:
+  - openjdk8
+
+script:
+  - ./gradlew fatJar
+
+before_deploy:
+    - mkdir MiningBuild
+    - find . -name '*.jar' -exec cp {} ./MiningBuild \;
+    - cd /home/travis/build/semantic-conflicts/mockito/MiningBuild
+    - tar -zcvf result.tar.gz *
+deploy:
+  provider: releases
+  api_key: $GITHUB_TOKEN
+  file: result.tar.gz
+  name: fetchjar-4b0bc1cc9d4ca09d939b9d9f0c78b64ff686b861
+  file_glob: true
+  overwrite: true
+  skip_cleanup: true
+  on:
+    all_branches: true 
+            
